@@ -19,6 +19,8 @@ from financial_api.schemas import (
     MarketDataPoint,
     MarketDataResponse,
     ModelMetadataResponse,
+    PredictBatchRequest,
+    PredictBatchResponse,
     PredictRequest,
     PredictResponse,
 )
@@ -84,6 +86,36 @@ def predict(request: PredictRequest) -> PredictResponse:
         raise HTTPException(status_code=422, detail=str(e)) from e
 
     return PredictResponse(**result)
+
+
+@app.post("/predict/batch", response_model=PredictBatchResponse)
+def predict_batch(request: PredictBatchRequest) -> PredictBatchResponse:
+    """
+    Igual que /predict, pero acepta una lista de símbolos y devuelve una
+    predicción por cada uno. Un símbolo con error individual no detiene
+    el resto del lote (queda simplemente fuera de la respuesta y se
+    reporta en logs); si se prefiere fallar rápido, cambiar el manejo
+    de excepciones aquí.
+    """
+    results = []
+    for symbol in request.symbols:
+        try:
+            result = predict_module.predict_symbol(
+                symbol=symbol.upper(),
+                prediction_horizon=request.prediction_horizon,
+                use_cached_data=request.use_cached_data,
+            )
+            results.append(PredictResponse(**result))
+        except (FileNotFoundError, ValueError):
+            continue
+
+    if not results:
+        raise HTTPException(
+            status_code=422,
+            detail="No se pudo generar ninguna predicción para los símbolos solicitados.",
+        )
+
+    return PredictBatchResponse(results=results)
 
 
 @app.get("/model/metadata", response_model=ModelMetadataResponse)

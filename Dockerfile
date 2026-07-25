@@ -20,6 +20,7 @@ RUN poetry install --no-root --only main --no-interaction --no-ansi
 COPY src ./src
 COPY artifacts ./artifacts
 COPY data ./data
+COPY README.md ./
 
 # Instalar el paquete del proyecto
 RUN poetry install --only main --no-interaction --no-ansi

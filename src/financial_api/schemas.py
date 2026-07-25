@@ -31,6 +31,16 @@ class PredictResponse(BaseModel):
     prediction_horizon: str
 
 
+class PredictBatchRequest(BaseModel):
+    symbols: list[str] = Field(..., min_length=1, max_length=20, examples=[["AAPL", "MSFT", "GOOGL"]])
+    prediction_horizon: int = Field(default=1, ge=1, le=5)
+    use_cached_data: bool = Field(default=True)
+
+
+class PredictBatchResponse(BaseModel):
+    results: list[PredictResponse]
+
+
 class MarketDataPoint(BaseModel):
     date: str
     open: float

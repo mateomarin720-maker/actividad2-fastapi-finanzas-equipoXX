@@ -54,6 +54,25 @@ def test_predict_endpoint_invalid_request_missing_symbol():
     assert response.status_code == 422  # error de validación de Pydantic
 
 
+def test_predict_batch_endpoint_valid_request():
+    response = client.post(
+        "/predict/batch",
+        json={"symbols": ["AAPL", "MSFT"], "prediction_horizon": 1, "use_cached_data": True},
+    )
+    assert response.status_code == 200
+    body = response.json()
+    assert "results" in body
+    assert len(body["results"]) == 2
+    for item in body["results"]:
+        assert item["prediction"] in ("up", "down")
+        assert 0.0 <= item["probability_up"] <= 1.0
+
+
+def test_predict_batch_endpoint_rejects_empty_list():
+    response = client.post("/predict/batch", json={"symbols": []})
+    assert response.status_code == 422
+
+
 def test_model_metadata_endpoint():
     response = client.get("/model/metadata")
     assert response.status_code == 200

@@ -19,7 +19,27 @@ FEATURE_COLUMNS = [
     "lag_return_1",
     "lag_return_2",
     "lag_return_3",
+    "rsi_14",
 ]
+
+
+def _compute_rsi(close: pd.Series, window: int = 14) -> pd.Series:
+    """
+    Relative Strength Index (RSI): indicador técnico de momentum que mide
+    la velocidad y magnitud de los cambios recientes de precio, en una
+    escala de 0 a 100. Valores > 70 suelen interpretarse como sobrecompra,
+    y < 30 como sobreventa.
+    """
+    delta = close.diff()
+    gain = delta.clip(lower=0)
+    loss = -delta.clip(upper=0)
+
+    avg_gain = gain.rolling(window=window).mean()
+    avg_loss = loss.rolling(window=window).mean()
+
+    rs = avg_gain / avg_loss.replace(0, pd.NA)
+    rsi = 100 - (100 / (1 + rs))
+    return rsi.fillna(50)  # sin suficiente historial: valor neutral
 
 
 def build_features(df: pd.DataFrame) -> pd.DataFrame:
@@ -39,6 +59,7 @@ def build_features(df: pd.DataFrame) -> pd.DataFrame:
     df["lag_return_1"] = df["return_1d"].shift(1)
     df["lag_return_2"] = df["return_1d"].shift(2)
     df["lag_return_3"] = df["return_1d"].shift(3)
+    df["rsi_14"] = _compute_rsi(df["Close"], window=14)
 
     # Target: ¿el retorno del día siguiente fue positivo?
     df["next_return"] = df["Close"].pct_change().shift(-1)

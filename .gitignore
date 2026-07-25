@@ -1,0 +1,22 @@
+# Poetry / Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+
+# Datos cacheados (se regeneran con financial_api.data; se puede versionar
+# una copia mínima para reproducibilidad si el equipo lo prefiere)
+data/processed/*.csv
+data/processed/*.parquet
+
+# Artefactos grandes de Docker
+*.pyc
+
+# Sistema operativo / editores
+.DS_Store
+.idea/
+.vscode/
+*.log

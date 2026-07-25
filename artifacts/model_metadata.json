@@ -1,0 +1,29 @@
+{
+  "model_version": "random_forest_v1",
+  "trained_at": "2026-07-25T18:37:39.649625+00:00",
+  "symbols": [
+    "AAPL",
+    "GOOGL",
+    "MSFT"
+  ],
+  "feature_columns": [
+    "return_1d",
+    "ma_5",
+    "ma_10",
+    "ma_20",
+    "volatility_5d",
+    "volatility_10d",
+    "lag_return_1",
+    "lag_return_2",
+    "lag_return_3"
+  ],
+  "target": "target_up (1 = retorno del siguiente día positivo, 0 = negativo o cero)",
+  "prediction_horizon_days": 1,
+  "metric_name": "roc_auc",
+  "metric_value": 0.501,
+  "accuracy": 0.5326,
+  "n_train_rows": 1155,
+  "n_test_rows": 291,
+  "model_type": "RandomForestClassifier",
+  "disclaimer": "Herramienta academica de analisis de senales financieras. No constituye asesoria financiera ni recomendacion de inversion."
+}
